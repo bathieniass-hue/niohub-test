@@ -18,7 +18,22 @@ jobs:
 
       - name: Fabriquer l'APK
         run: |
-          yes | buildozer -v android debug
+          CODE=0
+          yes | buildozer -v android debug > log.txt 2>&1 || CODE=$?
+          {
+            echo "## Erreurs trouvées"
+            echo '```'
+            grep -i -E "error|failed|traceback|exception" log.txt | tail -n 40
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+          exit $CODE
+
+      - name: Déposer le journal complet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journal-complet
+          path: log.txt
 
       - name: Déposer l'APK
         uses: actions/upload-artifact@v4
