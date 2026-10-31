@@ -9,14 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Donner les droits au dossier
+        run: sudo chmod -R 777 .
+
       - name: Fabriquer l'APK
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          workdir: .
+        run: |
+          docker run --rm --volume "$(pwd)":/home/user/hostcwd kivy/buildozer android debug
 
       - name: Déposer l'APK
         uses: actions/upload-artifact@v4
         with:
           name: niohub-test-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
